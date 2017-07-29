@@ -38,8 +38,11 @@ app.get('/admin', function (req, res) {
 });
 
 app.get("/api/posts", function (req, res) {
-  readPosts(function(error, posts) {
-      res.json(posts);
+  readPosts(function (error, posts) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.json(posts);
+
   });
 });
 
