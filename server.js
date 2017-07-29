@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const exphbs = require('express-handlebars');
 const fs = require("fs");
+const readPosts = require("./helpers/readPosts")
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
@@ -31,8 +32,14 @@ app.get('/my-cv', function (req, res) {
 app.get('/admin', function (req, res) {
   res.render("admin", {
     title: 'Admin', // insert your name instead 
-        subheading: "updates on admin work"
+    subheading: "updates on admin work"
 
+  });
+});
+
+app.get("/api/posts", function (req, res) {
+  readPosts(function(error, posts) {
+      res.json(posts);
   });
 });
 
@@ -43,23 +50,26 @@ app.get('/contact', function (req, res) {
   });
 });
 
-app.get('/', function (req, res){ 
-    const filePath = __dirname + '/data/posts.json'; 
-    const callbackFunction = function(error, file){
-        // we call .toString() to turn the file buffer to a String 
+app.get('/', function (req, res) {
+  const filePath = __dirname + '/data/posts.json';
+  const callbackFunction = function (error, file) {
+    // we call .toString() to turn the file buffer to a String 
     const fileData = file.toString();
-        // we use JSON.parse to get an object out the String 
-    const postsJson = JSON.parse(fileData);
-        // send the json to the Template to render 
-        res.render('index',
-        { 
-            title: 'Etzali Profile',
-            // insert your name instead 
-            posts: postsJson,
-        });
-    };
-             fs.readFile(filePath, callbackFunction);
+    // we use JSON.parse to get an object out the String 
+    const postsJson = JSON.parse(fileData).reverse();
+    // send the json to the Template to render 
+
+    res.render('index',
+      {
+        title: 'Etzali Profile',
+        // insert your name instead 
+        posts: postsJson,
+      });
+  };
+  fs.readFile(filePath, callbackFunction);
 });
+
+
 
 // what does this line mean: process.env.PORT || 3000
 app.listen(process.env.PORT || 3000, function () {
