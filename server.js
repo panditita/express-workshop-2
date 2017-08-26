@@ -39,10 +39,9 @@ app.get('/admin', function (req, res) {
 
 app.get("/api/posts", function (req, res) {
   readPosts(function (error, posts) {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "*"); // permision same origin policy
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.json(posts);
-
   });
 });
 
@@ -61,20 +60,52 @@ app.get('/', function (req, res) {
     // we use JSON.parse to get an object out the String 
     const postsJson = JSON.parse(fileData).reverse();
     // send the json to the Template to render 
-
+    console.log(postsJson);
     res.render('index',
       {
         title: 'Etzali Profile',
         // insert your name instead 
-        posts: postsJson,
+        posts: postsJson
       });
   };
   fs.readFile(filePath, callbackFunction);
 });
 
 
+/* var findPostByPostId = function (postid, callback) {
+  // Perform database query that calls callback when it's done
+  // This is our fake database
+  if (!post[postid])
+    return callback(new Error(
+      'No post matching '
+       + postid
+      )
+    );
+  return callback(null, post[postid]);
+}; */
 
-// what does this line mean: process.env.PORT || 3000
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Server is listening on port 3000. Ready to accept requests!");
+
+app.get('/posts/:id', function (req, res) {
+  const postId = req.params.id;
+  const filePath = __dirname + '/data/posts.json';
+  const callbackFunction = function (error, file) {
+    const fileData = file.toString();
+    const postsJson = JSON.parse(fileData);
+    //const firtPosts = postsJson.indexOf('title');
+    const first = [postsJson[0]]
+    res.render('posts',
+      {
+        title: first,
+        summary: first,
+        content: first,
+      });
+  };
+
+  fs.readFile(filePath, callbackFunction);
+  res.send(req.params);
+});
+
+
+app.listen(process.env.PORT || 5000, function () {
+  console.log("Server is listening on port 5000. Ready to accept requests!");
 });
